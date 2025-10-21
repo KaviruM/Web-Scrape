@@ -7,21 +7,19 @@ async function fetchAnimalDetails(url) {
   const dom = new JSDOM(text);
   const doc = dom.window.document;
 
-  const getText = (label) => {
-    const el = [...doc.querySelectorAll('strong')]
-      .find(e => e.textContent.trim().startsWith(label));
-    return el ? el.parentElement.textContent.replace(label, '').trim() : '';
-  };
+  const output = {}; 
 
-  return {
-    kingdom: getText('Kingdom'),
-    phylum: getText('Phylum'),
-    class: getText('Class'),
-    order: getText('Order'),
-    family: getText('Family'),
-    genus: getText('Genus'),
-    scientificName: getText('Scientific Name'),
-  };
+  const keys = doc.querySelectorAll('.animal-facts dt');
+  const values = doc.querySelectorAll('.animal-facts dd');
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i].textContent.trim();
+    const value = values[i].textContent.trim();
+    output[key] = value;
+  }
+
+  dom.window.close();
+  return output;
 }
 
 async function scrapeAnimals() {
@@ -33,7 +31,7 @@ async function scrapeAnimals() {
   const list = doc.querySelectorAll('.list-item.col-md-4.col-sm-6');
   const output = [];
 
-  for (let i = 0; i < Math.min(list.length, 5); i++) {
+  for (let i = 0; i < Math.min(list.length, 3); i++) {
     const a = list[i].querySelector('a');
     if (!a) continue;
 
